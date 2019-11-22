@@ -1,4 +1,5 @@
 #!/bin/sh
+. /system/sdcard/config/mqtt.conf
 
 # This file is supposed to bundle some frequently used functions
 # so they can be easily improved in one place and be reused all over the place
@@ -127,9 +128,11 @@ ir_led(){
   case "$1" in
   on)
     setgpio 49 0
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/ir ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
     ;;
   off)
     setgpio 49 1
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/ir ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
     ;;
   status)
     status=$(getgpio 49)
@@ -153,6 +156,7 @@ ir_cut(){
     sleep 1
     setgpio 26 0
     echo "1" > /var/run/ircut
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/ir_cut ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
     ;;
   off)
     setgpio 26 0
@@ -160,6 +164,7 @@ ir_cut(){
     sleep 1
     setgpio 25 0
     echo "0" > /var/run/ircut
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/ir_cut ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
     ;;
   status)
     status=$(cat /var/run/ircut)
@@ -380,10 +385,12 @@ motion_detection(){
   on)
     /system/sdcard/bin/setconf -k m -v $(get_config /system/sdcard/config/motion.conf motion_sensitivity)
     rewrite_config /system/sdcard/config/motion.conf motion_detection "on"
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/motion/detection ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
     ;;
   off)
     /system/sdcard/bin/setconf -k m -v -1
     rewrite_config /system/sdcard/config/motion.conf motion_detection "off"
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/motion/detection ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
     ;;
   status)
     status=$(/system/sdcard/bin/setconf -g m 2>/dev/null)
@@ -447,9 +454,11 @@ motion_tracking(){
   case "$1" in
   on)
     /system/sdcard/bin/setconf -k t -v on
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/motion/tracking ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
     ;;
   off)
     /system/sdcard/bin/setconf -k t -v off
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/motion/tracking ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
     ;;
   status)
     status=$(/system/sdcard/bin/setconf -g t 2>/dev/null)
@@ -471,10 +480,13 @@ night_mode(){
     /system/sdcard/bin/setconf -k n -v 1
     ir_led on
     ir_cut off
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/night_mode ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
+
     ;;
   off)
     ir_led off
     ir_cut on
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/night_mode ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
     /system/sdcard/bin/setconf -k n -v 0
     ;;
   status)
@@ -495,9 +507,13 @@ auto_night_mode(){
   case "$1" in
     on)
       /system/sdcard/controlscripts/auto-night-detection start
+      /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/night_mode/auto ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "ON"
+
       ;;
     off)
       /system/sdcard/controlscripts/auto-night-detection stop
+      /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/night_mode/auto ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -r -m "OFF"
+
       ;;
     status)
       if [ -f /run/auto-night-detection.pid ]; then
