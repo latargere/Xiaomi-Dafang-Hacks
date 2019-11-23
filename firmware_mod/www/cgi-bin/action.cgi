@@ -288,11 +288,11 @@ if [ -n "$F_cmd" ]; then
       return
     ;;
 
-    auto__start)
+    auto_night_mode_start)
       /system/sdcard/controlscripts/auto-night-detection start
     ;;
 
-    auto__stop)
+    auto_night_mode_stop)
       /system/sdcard/controlscripts/auto-night-detection stop
     ;;
 
@@ -431,9 +431,9 @@ if [ -n "$F_cmd" ]; then
 
     save_sw_night_config)
       #This also enables software mode
-      _conf=$(echo "${F_val}"| sed "s/+/ /g" | sed "s/%2C/,/g")
-      echo $_conf > /system/sdcard/config/autonight.conf
-      echo Saved $_conf
+      night_mode_conf=$(echo "${F_val}"| sed "s/+/ /g" | sed "s/%2C/,/g")
+      echo $night_mode_conf > /system/sdcard/config/autonight.conf
+      echo Saved $night_mode_conf
     ;;
 
     offDebug)
