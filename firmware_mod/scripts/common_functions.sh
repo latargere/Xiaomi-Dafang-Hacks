@@ -83,9 +83,13 @@ blue_led(){
   case "$1" in
   on)
     setgpio 39 0
+    include /system/sdcard/config/mqtt.conf
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/blue ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -m "ON"
     ;;
   off)
     setgpio 39 1
+    include /system/sdcard/config/mqtt.conf
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/blue ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -m "OFF"
     ;;
   status)
     status=$(getgpio 39)
@@ -105,9 +109,13 @@ yellow_led(){
   case "$1" in
   on)
     setgpio 38 0
+    include /system/sdcard/config/mqtt.conf
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/yellow ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -m "ON"
     ;;
   off)
     setgpio 38 1
+    include /system/sdcard/config/mqtt.conf
+    /system/sdcard/bin/mosquitto_pub.bin -h "$HOST" -p "$PORT" -u "$USER" -P "$PASS" -t "${TOPIC}"/leds/yellow ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS} -m "OFF"
     ;;
   status)
     status=$(getgpio 38)
